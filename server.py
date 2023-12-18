@@ -1,242 +1,138 @@
 import socket
 import mysql.connector
 
-# Password autorizzata
-PASSWORD = "einaudi1234"
+PASSWORD = "iuji"
 
-def db_get_dipendenti(parametri):
-    conn = mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
+connes = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="progetto",
+    port=3306
+)
+cur = connes.cursor()
 
-    cur = conn.cursor()
-
+def setCRUD(parametri):
     clausole = ""
     for key, value in parametri.items():
         clausole += f"and {key} = '{value}' "
+    
+    return clausole
 
-    query = f"SELECT * FROM dipendenti_lugli_gianluca where 1=1 {clausole}"
+def lettura(parametri, x):
+    query = ''
+    if x == 1:
+        query = f"SELECT * FROM dipendente where 1=1 {setCRUD(parametri)}"
+    if x == 2:
+        query = f"SELECT * FROM zona_lavoro where 1=1 {setCRUD(parametri)}"
+
     cur.execute(query)
     dati = cur.fetchall()
     return dati
 
-def db_get_zone(parametri):
-    conn = mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
+def elimina(parametri, x):
+    query = ''
+    if x == 1:
+        query = f"DELETE FROM dipendente where 1=1 {setCRUD(parametri)}"
+    if x == 2:
+        query = f"DELETE FROM zona_lavoro where 1=1 {setCRUD(parametri)}"
 
-    cur = conn.cursor()
-
-    clausole = ""
-    for key, value in parametri.items():
-        clausole += f"and {key} = '{value}' "
-
-    query = f"SELECT * FROM zone_di_lavoro_lugli_gianluca where 1=1 {clausole}"
     cur.execute(query)
-    dati = cur.fetchall()
-    return dati
+    connes.commit()
 
-def db_elimina_dipendente(parametri):
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    
-    cur = conn.cursor()
-    
-    clausole = ""
-    for key, value in parametri.items():
-        clausole += f"and {key} = '{value}' "
-    
-    query = f"DELETE FROM dipendenti_lugli_gianluca where 1=1 {clausole}"
+def scrittura(parametri, x):
+    query = ''
+    if x == 1:
+        query = f"INSERT INTO dipendente (nome, cognome, pos_lavorativa, data_nascita, stipendio) VALUES ('{lista[0]}','{lista[1]}','{lista[2]}','{lista[3]}','{lista[4]}')"
+    if x == 2:
+        query = f"INSERT INTO zona_lavoro (nome_zona, numero_clienti, Distretto) VALUES ('{lista[0]}','{lista[1]}','{lista[2]}')"
     cur.execute(query)
-    conn.commit()
+    connes.commit()
 
-def db_elimina_zona(parametri):
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    
-    cur = conn.cursor()
-    
-    clausole = ""
-    for key, value in parametri.items():
-        clausole += f"and {key} = '{value}' "
-    
-    query = f"DELETE FROM zone_di_lavoro_lugli_gianluca where 1=1 {clausole}"
+def modifica(par, x):
+    query = ''
+    if x == 1:
+        query = f"UPDATE dipendente SET nome = '{lista[0]}', cognome = '{lista[1]}', pos_lavorativa = '{lista[2]}', data_nascita = '{lista[3]}', stipendio = '{lista[4]}' WHERE id_d = '{lista[5]}'"
+    if x == 2:
+        query = f"UPDATE zona_lavoro SET nome_zona = '{lista[0]}', numero_clienti = '{lista[1]}', Distretto = '{lista[2]}' WHERE id_z = '{lista[3]}'"
     cur.execute(query)
-    conn.commit()
-
-def db_inserisci_dipendente(parametri):
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    
-    cur = conn.cursor()
-    
-    query = f"INSERT INTO dipendenti_lugli_gianluca (nome, cognome, data_assunzione, stipendio, telefono) VALUES ('{nome}','{cognome}','{data_assunzione}','{stipendio}','{telefono}')"
-    cur.execute(query)
-    conn.commit()
-
-def db_inserisci_zona(parametri):
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    
-    cur = conn.cursor()
-    
-    query = f"INSERT INTO zone_di_lavoro_lugli_gianluca (nome, numero_clienti, dimensione) VALUES ('{nome}','{numero_clienti}','{dimensione}')"
-    cur.execute(query)
-    conn.commit()
-
-def db_modifica_dipendente(par):
-    
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    cur = conn.cursor()
-    query = f"UPDATE dipendenti_lugli_gianluca SET nome = '{nome}', cognome = '{cognome}', data_assunzione = '{data_assunzione}', stipendio = '{stipendio}', telefono = '{telefono}' WHERE id_dipendente = '{id_modifica}'"
-    cur.execute(query)
-    conn.commit()
-
-def db_modifica_zona(par):
-    
-    conn=mysql.connector.connect(
-        host="10.10.0.10",
-        user="gianluca_lugli",
-        password="lugli1234",
-        database="5BTepsit",
-        port=3306
-    )
-    cur = conn.cursor()
-    query = f"UPDATE zone_di_lavoro_lugli_gianluca SET nome = '{nome}', numero_clienti = '{numero_clienti}', dimensione = '{dimensione}' WHERE id_zona = '{id_modifica}'"
-    cur.execute(query)
-    conn.commit()
+    connes.commit()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("localhost", 50007))
+s.bind(("localhost", 8888))
 s.listen()
 
 print("In attesa di connessioni...")
 
 conn, addr = s.accept()
 print('Connected by', addr)
-
-i = 0
-while i < 3:
-    password = conn.recv(1024).decode()
-    if password == PASSWORD:
-        conn.send("Password corretta. Inizia la comunicazione".encode())
-        break
-    else:
-        i += 1
-        tentativi_rimasti = 3 - i
-        if i < 3:
-            conn.send(f"Errore: Password sbagliata. Tentativi rimasti: {tentativi_rimasti}".encode())
+if __name__ == '__main__':
+    for i in range(3):
+        password = conn.recv(1024).decode()
+        if password == PASSWORD:
+            conn.send("Password corretta.".encode())
+            break
         else:
-            conn.send("Tentativi massimi raggiunti. Chiudo la connessione".encode())
-            conn.close()
-            exit()
+            if i < 3:
+                conn.send(f"Password errata.\n".encode())
+            else:
+                conn.send("Tentativi finiti, connessione chiusa.".encode())
+                conn.close()
+                exit()
 
-while True:
-    data = conn.recv(1024).decode()
-    if not data:
-        break  # Connessione chiusa dal client
-    if data == "5":
-        break  # Termina il server
+    while True:
+        data = conn.recv(1024).decode()
+        if not data:
+            break  
+        if data == "5":
+            break  
 
-    if data == "1":
-        
-        scelta = conn.recv(1024).decode()
-        if scelta == "1":
+        if data == "1":
+            scelta = conn.recv(1024).decode()
             nome = conn.recv(1024).decode()
-            par = {"nome": nome}
-            result = db_get_dipendenti(par)
+            if scelta == "1":
+                par = {"nome": nome}
+            else:
+                par = {"nome_zona": nome}
+            result = lettura(par, int(scelta))
             conn.send(str(result).encode())
-        
-        else:
-            nome = conn.recv(1024).decode()
-            par = {"nome": nome}
-            result = db_get_zone(par)
-            conn.send(str(result).encode())
-    
-    elif data == "2":
-
-        scelta = conn.recv(1024).decode()
-        if scelta == "1":
+            
+        elif data == "2":
+            scelta = conn.recv(1024).decode()
             id_elimina = conn.recv(1024).decode()
-            par = {"id_dipendente": id_elimina}
-            db_elimina_dipendente(par)
-        
-        else:
-            id_elimina = conn.recv(1024).decode()
-            par = {"id_zona": id_elimina}
-            db_elimina_zona(par)
-        
-    
-    elif data == "3":
+            if scelta == "1":
+                par = {"id_d": id_elimina}         
+            else:
+                par = {"id_z": id_elimina}
+            elimina(par, int(scelta))
 
-        scelta = conn.recv(1024).decode()
-        if scelta == "1":
-            nome = conn.recv(1024).decode()
-            cognome = conn.recv(1024).decode()
-            data_assunzione = conn.recv(1024).decode()
-            stipendio = conn.recv(1024).decode()
-            telefono = conn.recv(1024).decode()
-            par = {"nome": nome, "cognome": cognome, "data_assunzione": data_assunzione, "stipendio": stipendio, "telefono": telefono}
-            db_inserisci_dipendente(par)
-        else:
-            nome = conn.recv(1024).decode()
-            numero_clienti = conn.recv(1024).decode()
-            dimensione = conn.recv(1024).decode()
-            par = {"nome": nome, "numero_clienti": numero_clienti, "dimensione": dimensione}
-            db_inserisci_zona(par)
+        elif data == "3":
+            scelta = conn.recv(1024).decode()
+            lista = []
+            if scelta == "1":
+                for i in range(5):
+                    lista.append(conn.recv(1024).decode())
+                par = {"nome": lista[0], "cognome": lista[1], "pos_lavorativa": lista[2], "data_nascita": lista[3], "stipendio": lista[4]}
+                
+            else:
+                for i in range(3):
+                    lista.append(conn.recv(1024).decode())
+                par = {"nome_zona": lista[0], "numero_clienti": lista[1], "Distretto": lista[2]}
+            scrittura(par, int(scelta))
 
-    elif data == "4":
+        elif data == "4":
 
-        scelta = conn.recv(1024).decode()
-        if scelta == "1":
-            id_modifica = conn.recv(1024).decode()
-            nome = conn.recv(1024).decode()
-            cognome = conn.recv(1024).decode()
-            data_assunzione = conn.recv(1024).decode()
-            stipendio = conn.recv(1024).decode()
-            telefono = conn.recv(1024).decode()
-            par = {"id_dipendente": id_modifica, "nome": nome, "cognome": cognome, "data_assunzione": data_assunzione, "stipendio": stipendio, "telefono": telefono}
-            db_modifica_dipendente(par)
-        else:
-            id_modifica = conn.recv(1024).decode()
-            nome = conn.recv(1024).decode()
-            numero_clienti = conn.recv(1024).decode()
-            dimensione = conn.recv(1024).decode()
-            par = {"id_zona": id_modifica, "nome": nome, "numero_clienti": numero_clienti, "dimensione": dimensione}
-            db_modifica_zona(par)
+            scelta = conn.recv(1024).decode()
+            if scelta == "1":
+                for i in range(6):
+                    lista.append(conn.recv(1024).decode())
+                par = {"id_d": lista[0], "nome": lista[1], "cognome": lista[2], "pos_lavorativa": lista[3], "data_nascita": lista[4], "stipendio": lista[5]}
+                
+            else:
+                for i in range(4):
+                    lista.append(conn.recv(1024).decode())
+                par = {"id_z": lista[0], "nome_zona": lista[1], "numero_clienti": lista[2], "Distretto": lista[3]}
 
-conn.close()
+            modifica(par, int(scelta))
+
+    conn.close()
